@@ -1,7 +1,5 @@
 use std::collections::HashMap;
-use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::serde::{Deserialize, Serialize};
-use near_sdk::{env, AccountId, Gas, PanicOnDefault};
+use near_sdk::{ AccountId, Gas, PanicOnDefault};
 use near_sdk::near;
 
 //const TOKEN_CONTRACT: &str = "blackdragon.tkn.near";
@@ -12,8 +10,15 @@ const FT_BALANCE_OF_GAS: Gas = Gas::from_gas(10_000_000_000_000);
 const FOUR_HOURS: u64 = 4 * 60 * 60 * 1_000_000_000; 
 const NO_DEPOSIT: u128 = 0;
 
-#[derive(BorshDeserialize, BorshSerialize, Deserialize, Serialize)]
-#[serde(crate = "near_sdk::serde")]
+
+#[near(contract_state)]
+#[derive(PanicOnDefault)]
+pub struct GameContract {
+    players: HashMap<AccountId, Player>,
+    token_contract: AccountId,
+}
+
+#[near(serializers = [borsh, json])]
 pub struct Player {
     keys: u32,
     number_keys_per_claims: u32,
@@ -26,19 +31,12 @@ pub struct Player {
     time_to_next_key_claimable: u64,
 }
 
-#[near(contract_state)]
-#[derive(PanicOnDefault)]
-pub struct Contract {
-    players: HashMap<AccountId, Player>,
-    token_contract: AccountId,
-}
-
 #[near]
-pub impl Contract {
+impl GameContract {
     #[init]
     pub fn new(token_contract: AccountId) -> Self {
         Self {
-            players: HashMap::new(b"p"),
+            players: HashMap::new(),
             token_contract,
         }
     }
