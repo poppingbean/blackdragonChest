@@ -25,6 +25,7 @@ dependencies = [
  "near-sdk-macros",
  "rand",
  "serde_json",
+ "wee_alloc",
 ]
 
 [[package]]
